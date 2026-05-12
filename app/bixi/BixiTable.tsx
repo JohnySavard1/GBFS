@@ -13,6 +13,10 @@ export default function BixiTable() {
     const [stations, setStations] = useState<StationStatus[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [snapshotCount, setSnapshotCount] = useState<number>(0);
+    const [page, setPage] = useState(0);
+
+    const pageSize = 20;
 
     async function fetchBixiData() {
         try {
@@ -24,19 +28,28 @@ export default function BixiTable() {
 
             const data = await response.json();
 
-            console.log("Réponse API BIXI:", data);
-
             if (!response.ok) {
                 setError(data.error ?? "Erreur inconnue");
                 return;
             }
 
             const stationList = data?.data?.stations ?? [];
-
-            console.log("Nombre de stations:", stationList.length);
-
             setStations(stationList);
             setError(null);
+
+            try {
+                const countResponse = await fetch("/api/bixi/snapshot-count", {
+                    cache: "no-store",
+                });
+
+                const countData = await countResponse.json();
+
+                if (countResponse.ok) {
+                    setSnapshotCount(countData.snapshotCount);
+                }
+            } catch (countError) {
+                console.error("Erreur snapshot-count:", countError);
+            }
         } catch (err) {
             console.error(err);
             setError("Impossible de charger les données BIXI.");
@@ -53,12 +66,42 @@ export default function BixiTable() {
         return () => clearInterval(intervalId);
     }, []);
 
+    const startIndex = page * pageSize;
+    const visibleStations = stations.slice(startIndex, startIndex + pageSize);
+    const totalPages = Math.max(1, Math.ceil(stations.length / pageSize));
+
     if (loading) return <p>Chargement...</p>;
     if (error) return <p>Erreur : {error}</p>;
 
     return (
         <>
             <p className="mb-4">Stations chargées : {stations.length}</p>
+
+            <p className="mb-4">
+                Nombre de snapshots sauvegardés : {snapshotCount}
+            </p>
+
+            <div className="flex items-center gap-4 mb-4">
+                <button
+                    onClick={() => setPage((p) => Math.max(p - 1, 0))}
+                    disabled={page === 0}
+                    className="border px-4 py-2 rounded disabled:opacity-50"
+                >
+                    20 précédentes
+                </button>
+
+                <span>
+          Page {page + 1} / {totalPages}
+        </span>
+
+                <button
+                    onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+                    disabled={page >= totalPages - 1}
+                    className="border px-4 py-2 rounded disabled:opacity-50"
+                >
+                    20 suivantes
+                </button>
+            </div>
 
             <table className="border-collapse border w-full">
                 <thead>
@@ -71,7 +114,7 @@ export default function BixiTable() {
                 </thead>
 
                 <tbody>
-                {stations.slice(0, 20).map((station) => (
+                {visibleStations.map((station) => (
                     <tr key={station.station_id}>
                         <td className="border p-2">{station.station_id}</td>
                         <td className="border p-2">{station.num_bikes_available}</td>

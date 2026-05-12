@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: gbfs_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: gbfs_user
+      POSTGRES_PASSWORD: gbfs_password
+      POSTGRES_DB: gbfs_dashboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  next-app:
+    build: .
+    container_name: gbfs_next
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://gbfs_user:gbfs_password@postgres:5432/gbfs_dashboard
+    depends_on:
+      - postgres
+
+  collector:
+    build: .
+    container_name: gbfs_collector
+    restart: always
+    command: npx tsx scripts/collector.ts
+    environment:
+      API_BASE_URL: http://next-app:3000
+    depends_on:
+      - next-app
+
+volumes:
+  postgres_data:
+
