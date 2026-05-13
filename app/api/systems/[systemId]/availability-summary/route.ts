@@ -22,9 +22,7 @@ export async function GET(
                 COUNT(*) FILTER (WHERE bikes_available > 0 AND bikes_available <= 3) AS orange_count,
                 COUNT(*) FILTER (WHERE bikes_available > 3) AS green_count
             FROM latest_per_station;
-    WHERE system_id = $1
-      AND recorded_at = (SELECT recorded_at FROM latest_snapshot)
-    `,
+        `,
         [systemId]
     );
 
