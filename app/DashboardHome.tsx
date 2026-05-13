@@ -65,7 +65,7 @@ export default function DashboardHome() {
 
                     <StatCard
                         title="Collecte"
-                        value="2 min"
+                        value="10 min"
                         subtitle="Intervalle actuel"
                     />
 
