@@ -10,6 +10,8 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import StationHistoryChart from "./StationHistoryChart";
+import { useAtom } from "jotai";
+import { selectedSystemIdAtom } from "@/lib/atoms";
 
 
 type Station = {
@@ -51,7 +53,7 @@ function ChangeMapView({ center, zoom, }: {
 }
 
 export default function SystemsMap() {
-    const [systemId, setSystemId] = useState("montreal-bixi");
+    const [systemId, setSystemId] = useAtom(selectedSystemIdAtom);
     const [stations, setStations] = useState<Station[]>([]);
     const [error, setError] = useState<string | null>(null);
 
