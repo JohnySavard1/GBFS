@@ -130,25 +130,49 @@ export async function GET(
 
             for (const station of stations) {
                 const info = infoById.get(station.station_id);
+                const bikesAvailable = getAvailableBikes(station);
+                const docksAvailable = station.num_docks_available ?? 0;
+
+                const lastSnapshot = await client.query(
+                    `
+                SELECT bikes_available, docks_available
+                FROM station_snapshots
+                WHERE system_id = $1
+                  AND station_id = $2
+                ORDER BY recorded_at DESC
+                LIMIT 1
+                `,
+                                [system.id, station.station_id]
+                );
+
+                const last = lastSnapshot.rows[0];
+
+                if (
+                    last &&
+                    last.bikes_available === bikesAvailable &&
+                    last.docks_available === docksAvailable
+                ) {
+                    continue;
+                }
 
                 await client.query(
                     `
-                  INSERT INTO station_snapshots
-                    (
-                      system_id,
-                      city,
-                      provider,
-                      station_id,
-                      station_name,
-                      lat,
-                      lon,
-                      recorded_at,
-                      bikes_available,
-                      docks_available
-                    )
-                  VALUES
-                    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                  `,
+                        INSERT INTO station_snapshots
+                        (
+                            system_id,
+                            city,
+                            provider,
+                            station_id,
+                            station_name,
+                            lat,
+                            lon,
+                            recorded_at,
+                            bikes_available,
+                            docks_available
+                        )
+                        VALUES
+                            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                    `,
                     [
                         system.id,
                         system.city,
@@ -158,8 +182,8 @@ export async function GET(
                         info?.lat ?? null,
                         info?.lon ?? null,
                         recordedAt,
-                        getAvailableBikes(station),
-                        station.num_docks_available ?? 0,
+                        bikesAvailable,
+                        docksAvailable,
                     ]
                 );
             }

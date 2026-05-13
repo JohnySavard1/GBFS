@@ -9,16 +9,19 @@ export async function GET(
 
     const result = await pool.query(
         `
-    WITH latest_snapshot AS (
-      SELECT MAX(recorded_at) AS recorded_at
-      FROM station_snapshots
-      WHERE system_id = $1
-    )
-    SELECT
-      COUNT(*) FILTER (WHERE bikes_available = 0) AS red_count,
-      COUNT(*) FILTER (WHERE bikes_available > 0 AND bikes_available <= 3) AS orange_count,
-      COUNT(*) FILTER (WHERE bikes_available > 3) AS green_count
-    FROM station_snapshots
+            WITH latest_per_station AS (
+                SELECT DISTINCT ON (station_id)
+                station_id,
+                bikes_available
+            FROM station_snapshots
+            WHERE system_id = $1
+            ORDER BY station_id, recorded_at DESC
+                )
+            SELECT
+                COUNT(*) FILTER (WHERE bikes_available = 0) AS red_count,
+                COUNT(*) FILTER (WHERE bikes_available > 0 AND bikes_available <= 3) AS orange_count,
+                COUNT(*) FILTER (WHERE bikes_available > 3) AS green_count
+            FROM latest_per_station;
     WHERE system_id = $1
       AND recorded_at = (SELECT recorded_at FROM latest_snapshot)
     `,
