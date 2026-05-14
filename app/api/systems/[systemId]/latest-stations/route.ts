@@ -30,7 +30,10 @@ export async function GET(
                     lon,
                     recorded_at,
                     bikes_available,
-                    docks_available
+                    docks_available,
+                    capacity,
+                    bikes_disabled,
+                    docks_disabled
                 FROM station_snapshots
                 WHERE system_id = $1
                   AND lat IS NOT NULL

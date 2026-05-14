@@ -5,8 +5,14 @@ import { getGbfsFeedUrl } from "@/lib/gbfs";
 
 type StationStatus = {
     station_id: string;
-    num_bikes_available: number;
-    num_docks_available: number;
+    num_bikes_available?: number;
+    num_docks_available?: number;
+    num_bikes_disabled?: number;
+    num_docks_disabled?: number;
+    vehicle_types_available?: {
+        vehicle_type_id: string;
+        count: number;
+    }[];
 };
 
 type StationInformation = {
@@ -14,6 +20,7 @@ type StationInformation = {
     name?: unknown;
     lat?: number;
     lon?: number;
+    capacity?: number;
 };
 
 function getAvailableBikes(station: StationStatus) {
@@ -168,10 +175,13 @@ export async function GET(
                             lon,
                             recorded_at,
                             bikes_available,
-                            docks_available
+                            docks_available,
+                            capacity,
+                            bikes_disabled,
+                            docks_disabled
                         )
                         VALUES
-                            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                     `,
                     [
                         system.id,
@@ -184,6 +194,9 @@ export async function GET(
                         recordedAt,
                         bikesAvailable,
                         docksAvailable,
+                        info?.capacity ?? null,
+                        station.num_bikes_disabled ?? 0,
+                        station.num_docks_disabled ?? 0,
                     ]
                 );
             }

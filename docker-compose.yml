@@ -20,6 +20,8 @@ services:
       - "80:3000"
     environment:
       DATABASE_URL: postgresql://gbfs_user:gbfs_password@postgres:5432/gbfs_dashboard
+    volumes:
+      - ./exports:/app/exports
     depends_on:
       - postgres
 
@@ -32,6 +34,18 @@ services:
       API_BASE_URL: http://next-app:3000
     depends_on:
       - next-app
+
+  export-worker:
+    build: .
+    container_name: gbfs_export_worker
+    restart: always
+    command: npx tsx scripts/export-worker.ts
+    environment:
+      DATABASE_URL: postgresql://gbfs_user:gbfs_password@postgres:5432/gbfs_dashboard
+    volumes:
+      - ./exports:/app/exports
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

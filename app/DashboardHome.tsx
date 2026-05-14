@@ -38,9 +38,19 @@ export default function DashboardHome() {
                     <p className="text-sm text-slate-500">Research Admin</p>
                 </div>
 
-                <nav>
-                    <a className="block rounded-lg bg-white px-3 py-2 font-medium shadow-sm">
+                <nav className="space-y-2">
+                    <a
+                        href="/"
+                        className="block rounded-lg bg-white px-3 py-2 font-medium shadow-sm"
+                    >
                         Dashboard
+                    </a>
+
+                    <a
+                        href="/reports"
+                        className="block rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-white"
+                    >
+                        Rapports
                     </a>
                 </nav>
             </aside>

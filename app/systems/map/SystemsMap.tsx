@@ -22,6 +22,9 @@ type Station = {
     bikes_available: number;
     docks_available: number;
     recorded_at: string;
+    capacity: number | null;
+    bikes_disabled: number;
+    docks_disabled: number;
 };
 
 const SYSTEMS = [
@@ -141,10 +144,19 @@ export default function SystemsMap() {
                                         <strong>Station ID :</strong> {station.station_id}
                                     </p>
                                     <p>
+                                        <strong>Capacité :</strong> {station.capacity ?? "N/D"}
+                                    </p>
+                                    <p>
                                         <strong>Vélos disponibles :</strong> {station.bikes_available}
                                     </p>
                                     <p>
+                                        <strong>Vélos désactivés :</strong> {station.bikes_disabled}
+                                    </p>
+                                    <p>
                                         <strong>Bornes libres :</strong> {station.docks_available}
+                                    </p>
+                                    <p>
+                                        <strong>Bornes désactivées :</strong> {station.docks_disabled}
                                     </p>
                                     <p>
                                         <strong>Dernier snapshot :</strong>{" "}
