@@ -7,7 +7,7 @@ type ExportJob = {
     id: string;
     system_id: string | null;
     status: string;
-    report_type: "full" | "short";
+    report_type: "full" | "short" | "hourly-average";
     file_path: string | null;
     created_at: string;
     started_at: string | null;
@@ -29,7 +29,7 @@ export default function ReportsPageClient() {
         setJobs(data.jobs ?? []);
     }
 
-    async function createJob(reportType: "full" | "short") {
+    async function createJob(reportType: "full" | "short" | "hourly-average") {
         setLoading(true);
 
         const response = await fetch("/api/export/jobs", {
@@ -122,6 +122,14 @@ export default function ReportsPageClient() {
                                 className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-50"
                             >
                                 {loading ? "Création..." : "Rapport complet"}
+                            </button>
+
+                            <button
+                                onClick={() => createJob("hourly-average")}
+                                disabled={loading}
+                                className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-500 disabled:opacity-50"
+                            >
+                                {loading ? "Création..." : "Rapport horaire"}
                             </button>
                         </div>
                     </div>

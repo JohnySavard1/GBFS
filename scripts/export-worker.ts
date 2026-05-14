@@ -57,49 +57,115 @@ async function processJob() {
 
         let query: string;
 
-        if (job.report_type === "short") {
+        if (job.report_type === "hourly-average") {
             query = job.system_id
                 ? `
-          SELECT
-            system_id AS "Nom System",
-            station_id AS "ID_Station",
-            capacity,
-            bikes_available AS "bike available",
-            bikes_disabled AS "bike disable",
-            docks_available AS "dock available",
-            docks_disabled AS "dock disable",
-            recorded_at AT TIME ZONE 'America/Toronto' AS datetime
-          FROM station_snapshots
-          WHERE system_id = $1
-          ORDER BY system_id, recorded_at, station_id
-        `
-                    : `
-          SELECT
-            system_id AS "Nom System",
-            station_id AS "ID_Station",
-            capacity,
-            bikes_available AS "bike available",
-            bikes_disabled AS "bike disable",
-            docks_available AS "dock available",
-            docks_disabled AS "dock disable",
-            recorded_at AT TIME ZONE 'America/Toronto' AS datetime
-          FROM station_snapshots
-          ORDER BY system_id, recorded_at, station_id
-        `;
-            } else {
-                query = job.system_id
-                    ? `
-          SELECT *
-          FROM station_snapshots
-          WHERE system_id = $1
-          ORDER BY system_id, recorded_at, station_id
-        `
-                    : `
-          SELECT *
-          FROM station_snapshots
-          ORDER BY system_id, recorded_at, station_id
-        `;
-            }
+      SELECT
+        system_id AS "system",
+        station_id AS "station_id",
+        station_name AS "station_name",
+
+        date_trunc(
+          'hour',
+          recorded_at AT TIME ZONE 'America/Toronto'
+        ) AS "hour",
+
+        ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
+        ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
+        ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
+        ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
+
+        MAX(capacity) AS "capacity"
+
+      FROM station_snapshots
+
+      WHERE system_id = $1
+
+      GROUP BY
+        system_id,
+        station_id,
+        station_name,
+        hour
+
+      ORDER BY
+        system_id,
+        station_id,
+        hour
+    `
+                : `
+      SELECT
+        system_id AS "system",
+        station_id AS "station_id",
+        station_name AS "station_name",
+
+        date_trunc(
+          'hour',
+          recorded_at AT TIME ZONE 'America/Toronto'
+        ) AS "hour",
+
+        ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
+        ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
+        ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
+        ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
+
+        MAX(capacity) AS "capacity"
+
+      FROM station_snapshots
+
+      GROUP BY
+        system_id,
+        station_id,
+        station_name,
+        hour
+
+      ORDER BY
+        system_id,
+        station_id,
+        hour
+    `;
+        } else if (job.report_type === "short") {
+            query = job.system_id
+                ? `
+      SELECT
+        system_id AS "Nom System",
+        station_id AS "ID_Station",
+        capacity,
+        bikes_available AS "bike available",
+        bikes_disabled AS "bike disable",
+        docks_available AS "dock available",
+        docks_disabled AS "dock disable",
+        recorded_at AT TIME ZONE 'America/Toronto' AS datetime
+      FROM station_snapshots
+      WHERE system_id = $1
+      ORDER BY system_id, recorded_at, station_id
+    `
+                : `
+      SELECT
+        system_id AS "Nom System",
+        station_id AS "ID_Station",
+        capacity,
+        bikes_available AS "bike available",
+        bikes_disabled AS "bike disable",
+        docks_available AS "dock available",
+        docks_disabled AS "dock disable",
+        recorded_at AT TIME ZONE 'America/Toronto' AS datetime
+      FROM station_snapshots
+      ORDER BY system_id, recorded_at, station_id
+    `;
+        } else {
+            query = job.system_id
+                ? `
+      SELECT *
+      FROM station_snapshots
+      WHERE system_id = $1
+      ORDER BY system_id, recorded_at, station_id
+    `
+                : `
+      SELECT *
+      FROM station_snapshots
+      ORDER BY system_id, recorded_at, station_id
+    `;
+        }
 
         const values = job.system_id ? [job.system_id] : [];
 
