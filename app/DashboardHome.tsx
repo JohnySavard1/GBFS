@@ -152,6 +152,7 @@ function AvailabilityPanel() {
                     color="bg-green-500"
                     maxValue={maxValue}
                 />
+
                 <div className="flex flex-col gap-4">
                     <Bubble
                         label="Orange"
@@ -159,6 +160,7 @@ function AvailabilityPanel() {
                         color="bg-orange-400"
                         maxValue={maxValue}
                     />
+
                     <Bubble
                         label="Rouge"
                         value={summary.red}
@@ -166,6 +168,15 @@ function AvailabilityPanel() {
                         maxValue={maxValue}
                     />
                 </div>
+            </div>
+
+            <div className="mt-8 flex justify-center">
+                <a
+                    href="/api/export/snapshots"
+                    className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                >
+                    Exporter tous les systèmes CSV
+                </a>
             </div>
         </div>
     );
