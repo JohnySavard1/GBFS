@@ -60,68 +60,59 @@ async function processJob() {
         if (job.report_type === "hourly-average") {
             query = job.system_id
                 ? `
-      SELECT
-        system_id AS "system",
-        station_id AS "station_id",
-        station_name AS "station_name",
+                        SELECT
+                            system_id AS "system",
+                            station_id AS "station_id",
 
-        date_trunc(
-          'hour',
-          recorded_at AT TIME ZONE 'America/Toronto'
-        ) AS "hour",
+                            to_char(
+                                    date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto'),
+                                    'DD Mon YYYY HH24"h"'
+                            ) AS "datetime",
 
-        ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
-        ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
-        ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
-        ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
+                            ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
+                            ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
+                            ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
+                            ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
 
-        MAX(capacity) AS "capacity"
+                            MAX(capacity) AS "capacity"
 
-      FROM station_snapshots
-
-      WHERE system_id = $1
-
-      GROUP BY
-        system_id,
-        station_id,
-        station_name,
-        hour
-
-      ORDER BY
-        system_id,
-        station_id,
-        hour
+                        FROM station_snapshots
+                        WHERE system_id = $1
+                        GROUP BY
+                            system_id,
+                            station_id,
+                            date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto')
+                        ORDER BY
+                            system_id,
+                            station_id,
+                            date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto')
     `
                 : `
-      SELECT
-        system_id AS "system",
-        station_id AS "station_id",
-        station_name AS "station_name",
+                        SELECT
+                            system_id AS "system",
+                            station_id AS "station_id",
 
-        date_trunc(
-          'hour',
-          recorded_at AT TIME ZONE 'America/Toronto'
-        ) AS "hour",
+                            to_char(
+                                    date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto'),
+                                    'DD Mon YYYY HH24"h"'
+                            ) AS "datetime",
 
-        ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
-        ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
-        ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
-        ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
+                            ROUND(AVG(bikes_available)::numeric, 2) AS "avg_bikes_available",
+                            ROUND(AVG(docks_available)::numeric, 2) AS "avg_docks_available",
+                            ROUND(AVG(bikes_disabled)::numeric, 2) AS "avg_bikes_disabled",
+                            ROUND(AVG(docks_disabled)::numeric, 2) AS "avg_docks_disabled",
 
-        MAX(capacity) AS "capacity"
+                            MAX(capacity) AS "capacity"
 
-      FROM station_snapshots
-
-      GROUP BY
-        system_id,
-        station_id,
-        station_name,
-        hour
-
-      ORDER BY
-        system_id,
-        station_id,
-        hour
+                        FROM station_snapshots
+                        GROUP BY
+                            system_id,
+                            station_id,
+                            date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto')
+                        ORDER BY
+                            system_id,
+                            station_id,
+                            date_trunc('hour', recorded_at AT TIME ZONE 'America/Toronto')
     `;
         } else if (job.report_type === "short") {
             query = job.system_id
