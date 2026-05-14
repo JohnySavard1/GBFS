@@ -179,15 +179,6 @@ function AvailabilityPanel() {
                     />
                 </div>
             </div>
-
-            <div className="mt-8 flex justify-center">
-                <a
-                    href="/api/export/snapshots"
-                    className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
-                >
-                    Exporter tous les systèmes CSV
-                </a>
-            </div>
         </div>
     );
 }
