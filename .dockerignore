@@ -1,4 +1,15 @@
+cat > .dockerignore <<'EOF'
 node_modules
 .next
 .git
-.env
+.idea
+
+python
+exports
+
+*.csv
+*.parquet
+*.zip
+
+.DS_Store
+EOF

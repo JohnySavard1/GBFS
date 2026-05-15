@@ -26,7 +26,9 @@ services:
       - postgres
 
   collector:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
     container_name: gbfs_collector
     restart: always
     command: npx tsx scripts/collector.ts
@@ -36,7 +38,9 @@ services:
       - next-app
 
   export-worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
     container_name: gbfs_export_worker
     restart: always
     command: npx tsx scripts/export-worker.ts

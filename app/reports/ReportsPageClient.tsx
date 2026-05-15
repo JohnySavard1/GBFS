@@ -81,6 +81,12 @@ export default function ReportsPageClient() {
                     >
                         Rapports
                     </a>
+                    <a
+                        href="/analysis"
+                        className="block rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-white"
+                    >
+                        Analysis
+                    </a>
                 </nav>
             </aside>
 
