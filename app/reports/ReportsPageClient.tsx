@@ -85,7 +85,13 @@ export default function ReportsPageClient() {
                         href="/analysis"
                         className="block rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-white"
                     >
-                        Analysis
+                        Analysis des deltas
+                    </a>
+                    <a
+                        href="/hourly-averages"
+                        className="block rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-white"
+                    >
+                        Moyennes horaires
                     </a>
                 </nav>
             </aside>

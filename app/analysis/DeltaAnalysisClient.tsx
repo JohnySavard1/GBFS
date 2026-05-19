@@ -70,7 +70,10 @@ export default function DeltaAnalysisClient() {
                         Rapports
                     </a>
                     <a href="/analysis" className="block rounded-lg bg-white px-3 py-2 font-medium shadow-sm">
-                        Analyse
+                        Analyse des deltas
+                    </a>
+                    <a href="/hourly-averages" className="block rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-white">
+                        Moyennes horaires
                     </a>
                 </nav>
             </aside>
