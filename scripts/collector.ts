@@ -22,4 +22,4 @@ async function collectAllSystems() {
 
 collectAllSystems();
 
-setInterval(collectAllSystems, 10 * 60 * 1000);
+setInterval(collectAllSystems, 60 * 1000);

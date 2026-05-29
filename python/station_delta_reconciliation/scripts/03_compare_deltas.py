@@ -42,6 +42,14 @@ def classify_action(delta):
 
 merged["classification"] = merged["unexplained_delta"].apply(classify_action)
 
+merged = merged.dropna(subset=[
+    "observed_delta_bikes",
+    "expected_delta_from_trips",
+    "unexplained_delta",
+])
+
+merged = merged[merged["classification"] != "unknown"]
+
 merged = merged[
     [
         "station",
